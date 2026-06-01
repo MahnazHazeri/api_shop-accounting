@@ -1,10 +1,10 @@
 from uuid import UUID
-from datetime import date
+from datetime import date, datetime
 from typing import Optional,List
 from pydantic import Field,model_validator
 from archipy.models.dtos.base_dtos import BaseDTO
 
-from src.models.type.enum_type import UnitType,PymantType
+from src.models.type.enum_type import UnitType,PymantType,RoleType
 
 # --------------------------------------Prodacte-------------------------------------
 # -----------------------------------------------------------------------------------
@@ -61,6 +61,7 @@ class SearchSupplierRequest(BaseDTO):
     q: str = Field(..., min_length=1, description="متن جستجو (نام تامین کننده)")
 
 # ---------------------------------------------saleitem-------------------------------------------
+# ------------------------------------------------------------------------------------------------
 class SaleItemCreateRequest(BaseDTO):
     name: Optional[str] = Field(None, description="نام کالا (برای کالاهای بدون بارکد)")
     barcode: Optional[str] = Field(None, description="بارکد کالا")
@@ -69,7 +70,8 @@ class SaleItemCreateRequest(BaseDTO):
 class SaleItemUpdateRequest(BaseDTO):
     quantity: Optional[float] = Field(None, gt=0, description="تعداد جدید")
     discounted_price: Optional[int] = Field(None, gt=0, description="قیمت تخفیفی جدید (ریال)")
-
+# -----------------------------------------------saleinvoice------------------------------------------
+# ----------------------------------------------------------------------------------------------------
 class SaleInvoiceCreateRequest(BaseDTO):
     items: List[SaleItemCreateRequest] = Field(..., min_length=1, description="لیست کالاهای فروخته شده")
     discount_amount: int = Field(0, ge=0, description="مبلغ تخفیف کل فاکتور")
@@ -81,7 +83,7 @@ class SaleInvoiceUpdateRequest(BaseDTO):
     discount_amount: Optional[int] = Field(None, ge=0, description="مبلغ تخفیف جدید")
     payment_type: Optional[PymantType] = Field(None, description="نوع پرداخت جدید")
 
-# ---------------------------purchaseitem---------------------------------------------------------
+# -------------------------------------------purchaseitem------------------------------------------
 # -------------------------------------------------------------------------------------------------
 class PurchaseItemCreateRequest(BaseDTO):
     name: Optional[str] = Field(None, description="نام کالا")
@@ -98,6 +100,8 @@ class PurchaseItemCreateRequest(BaseDTO):
 class PurchaseItemUpdateRequest(BaseDTO):
     quantity: Optional[float] = Field(None, gt=0, description="تعداد (عدد/کیلو/)")
     unit_price: Optional[int] = Field(None, gt=0, description="قیمت واحد")
+# --------------------------------------------purchaseinvoce------------------------------------------
+# ----------------------------------------------------------------------------------------------------
 
 class PurchaseInvoiceCreateRequest(BaseDTO):
     supplier_id: UUID = Field(..., description="شناسه تامین کننده")
@@ -110,3 +114,23 @@ class UpdatePurchaseInvoiceRequest(BaseDTO):
     discount: Optional[int] = Field(None, ge=0, description="مبلغ تخفیف ")
     date: Optional[date] = Field(None, description="تاریخ خرید")
 
+# ---------------------------------------------user---------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+class UserBase(BaseDTO):
+    username: str = Field(..., min_length=3, max_length=50, description="نام کاربری")
+    full_name: str = Field(..., min_length=2, max_length=100, description="نام خانوادگی")
+    role: RoleType = Field(default=RoleType.CASHIER, description="نقش کاربر در سیستم")
+
+
+class UserCreate(UserBase):
+    password: str = Field(...,min_length=6, description="رمز کاربری")
+
+class GetUserInformation(UserBase):
+    id: UUID
+    is_active: bool
+    created_at: datetime
+
+class UserLogin(BaseDTO):
+    username: str = Field(..., description="نام کاربری")
+    password: str = Field(...,description="رمز عبور")

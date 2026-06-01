@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, Synonym, mapped_column
 
 
 
+# ========================جدول آیتم های خرید==========================
 
 class PurchaseItem(UpdatableDeletableAdminEntity):
     __tablename__ = "purchase_items"
@@ -14,8 +15,8 @@ class PurchaseItem(UpdatableDeletableAdminEntity):
     id = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4,)
     pk_uuid = Synonym("id")
 
-    purchase_invoice_id: Mapped[str] = mapped_column(ForeignKey("purchase_invoices.id", ondelete="CASCADE"), nullable=False,)
-    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), nullable=False,)
+    purchase_invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("purchase_invoices.id", ondelete="CASCADE"), nullable=False,)
+    product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("products.id"), nullable=False,)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False,)
     unit_price: Mapped[int] = mapped_column(Integer, nullable=False,)
     total_price: Mapped[int] = mapped_column(Integer, nullable=False,)

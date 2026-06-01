@@ -6,7 +6,7 @@ from archipy.models.dtos.base_dtos import BaseDTO
 
 
 from src.models.type.enum_type import PymantType
-from src.dtos.article.domain.v1.article_domain_interface_dtos import (
+from src.models.dtos.article.domain.v1.article_domain_interface_dtos import (
     BaseSchemaProducts,
     ProductIdentifier,
     SupplierIdentifier,
@@ -16,6 +16,8 @@ from src.dtos.article.domain.v1.article_domain_interface_dtos import (
 
 # ---------------------------------------product-----------------------------------------------
 # ---------------------------------------------------------------------------------------------
+
+
 class GetListProducts(BaseSchemaProducts):
     id: UUID = Field(..., description="شناسه یکتا")
     created_at: datetime = Field(..., description="تاریخ ایجاد")
@@ -39,6 +41,7 @@ class SearchProductResponse(BaseSchemaProducts):
 
 # ---------------------------supplier--------------------------------------------------------
 # -------------------------------------------------------------------------------------------
+
 class BaseSupplierResponse(BaseDTO):
     id: UUID = Field(..., description="شناسه یکتا")
     name: str = Field(..., description="نام تامین کننده")
@@ -68,6 +71,7 @@ class SearchSupplierResponse(BaseSupplierResponse):
 
 # -------------------------------------saleitem-response----------------------------------
 # ----------------------------------------------------------------------------------------
+
 class SaleItemResponse(BaseDTO):
     id: UUID = Field(..., description="شناسه آیتم")
     product_id: UUID = Field(..., description="شناسه کالا")
@@ -118,6 +122,7 @@ class SaleInvoiceListResponse(BaseDTO):
 
 # ---------------------------purchaseitem---------------------------------------------------
 # ------------------------------------------------------------------------------------------
+
 class PurchaseItemCreateResponse(BaseDTO):
     id: UUID = Field(..., description="شناسه آیتم")
     purchase_invoice_id: UUID = Field(..., description="شناسه فاکتور خرید")
@@ -179,6 +184,7 @@ class PurchaseInvoiceDetailResponse(PurchaseInvoiceSchema):
 
 # --------------------------------------------inventorymove-----------------------------------
 # --------------------------------------------------------------------------------------------
+
 class InventorySchema(BaseDTO):
     product_id: UUID = Field(..., description="شناسه کالا")
     product_name: str = Field(..., description="نام کالا")
@@ -231,6 +237,7 @@ class LowStockListResponse(BaseDTO):
 
 # -----------------------------------------dailysales--------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+
 class DailySalesReportItem(BaseDTO):
     product_name: str = Field(..., description="نام کالا")
     total_quantity: float = Field(..., description="تعداد کل فروخته شده")

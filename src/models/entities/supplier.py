@@ -1,10 +1,12 @@
 import uuid
 from datetime import datetime ,timezone
 from archipy.models.entities.sqlalchemy.base_entities import UpdatableDeletableAdminEntity
-from sqlalchemy import UUID,Integer,DateTime ,String,Text
+from sqlalchemy import UUID,DateTime ,String,Text
 from sqlalchemy.orm import Mapped, Synonym, mapped_column
 
 
+
+# ========================== جدول تامین کنندگان===========================
 
 class Supplier(UpdatableDeletableAdminEntity):
     __tablename__ = "suppliers"

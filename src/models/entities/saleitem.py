@@ -6,14 +6,16 @@ from sqlalchemy.orm import Mapped, Synonym, mapped_column
 
 
 
+# ======================= جدول آیتم ها فروش===========================
+
 class SaleItem(UpdatableDeletableAdminEntity):
     __tablename__ = "sales_items"
 
     id = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4,)
     pk_uuid = Synonym("id")
 
-    sales_invoice_id: Mapped[str] = mapped_column(ForeignKey("sales_invoices.id", ondelete="CASCADE"), nullable=False,)
-    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), nullable=False,)
+    sales_invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sales_invoices.id", ondelete="CASCADE"), nullable=False,)
+    product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("products.id"), nullable=False,)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False,)
     market_price: Mapped[int] = mapped_column(Integer, nullable=False,)
     discounted_price: Mapped[int] = mapped_column(Integer, nullable=False,)

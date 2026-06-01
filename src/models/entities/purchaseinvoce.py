@@ -6,6 +6,9 @@ from sqlalchemy.orm import Mapped, Synonym, mapped_column
 
 
 
+
+# ====================== جدول فاکتور خرید============================
+
 class PurchaseInvoice(UpdatableDeletableAdminEntity):
     __tablename__ = "purchase_invoices"
 
@@ -14,7 +17,8 @@ class PurchaseInvoice(UpdatableDeletableAdminEntity):
 
     invoice_number: Mapped[str] = mapped_column(String(50), nullable=False, index=True,)
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=text("CURRENT_DATE"),)
-    supplier_id: Mapped[str] = mapped_column(ForeignKey("suppliers.id"), nullable=False,)
+    supplier_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("suppliers.id"), nullable=False,)
+    created_by_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False,)
     total_amount: Mapped[int] = mapped_column(Integer, nullable=True, default=0,)
     discount: Mapped[int] = mapped_column(Integer, nullable=True, default=0,)
     final_amount: Mapped[int] = mapped_column(Integer, nullable=True, default=0,)
