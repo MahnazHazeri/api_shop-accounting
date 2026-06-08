@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime ,timezone
 from archipy.models.entities.sqlalchemy.base_entities import UpdatableDeletableAdminEntity
-from sqlalchemy import UUID,Integer,DateTime ,String,text,ForeignKey
+from sqlalchemy import UUID, Integer, DateTime, String, text, ForeignKey
 from sqlalchemy.orm import Mapped, Synonym, mapped_column
 
 

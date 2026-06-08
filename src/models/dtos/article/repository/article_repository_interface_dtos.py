@@ -5,7 +5,7 @@ from typing import Optional,List
 from archipy.models.dtos.base_dtos import BaseDTO
 
 
-from src.models.type.enum_type import PymantType
+from src.models.type.enum_type import PymantType,UnitType,WarehouseType
 from src.models.dtos.article.domain.v1.article_domain_interface_dtos import (
     BaseSchemaProducts,
     ProductIdentifier,
@@ -30,7 +30,7 @@ class DeleteProductRequest(ProductIdentifier):
     pass
 
 class DeleteProductsResponse(BaseDTO):
-    message: str = Field(..., description="کالا با موفقیت حذف شد")
+    message: str = Field("کالا با موفقیت حذف شد", description="پیام نتیجه")
 
 class EditproductResponse(BaseSchemaProducts):
     pass
@@ -60,7 +60,7 @@ class DeleteSupplierRequest(SupplierIdentifier):
     pass
 
 class DeleteSupplierResponse(BaseDTO):
-    message: str = Field(..., description="اطلاعات تامین کننده به درستی حذف شدند")
+    message: str = Field("اطلاعات تامین کننده به درستی حذف شدند", description="پیام نتیجه ")
 
 class GetSupplierList(BaseDTO):
     id: UUID = Field(..., description="شناسه یکتا")
@@ -78,10 +78,12 @@ class SaleItemResponse(BaseDTO):
     product_name: str = Field(..., description="نام کالا")
     barcode: str = Field(..., description="بارکد کالا")
     quantity: float = Field(..., description="تعداد")
-    unit: str = Field(..., description="واحد")
+    selected_unit: UnitType = Field(..., description="واحد انتخاب شده برای فروش")
+    unit_price: int = Field(..., description="قیمت واحد انتخاب شده")
+    total_price: int = Field(..., description="قیمت کل")
     market_price: int = Field(..., description="قیمت بازار")
     discounted_price: int = Field(..., description="قیمت تخفیفی")
-    total_price: int = Field(..., description="قیمت کل")
+
 
 class SaleItemUpdateResponse(SaleItemResponse):
     pass
@@ -93,6 +95,8 @@ class SaleItemListResponse(BaseDTO):
     total: int = Field(..., description="تعداد کل آیتم ها")
     items: List[SaleItemResponse] = Field(..., description="لیست آیتم ها")
 
+# -------------------------------------saleinvoice-response------------------------------
+# ----------------------------------------------------------------------------------------
 class SaleInvoiceResponse(BaseDTO):
     id: UUID = Field(..., description="شناسه فاکتور")
     invoice_number: str = Field(..., description="شماره فاکتور")
@@ -118,7 +122,7 @@ class SaleInvoiceDetailResponse(SaleInvoiceResponse):
 
 class SaleInvoiceListResponse(BaseDTO):
     total: int = Field(..., description="تعداد کل فاکتور ها")
-    item: List[SaleInvoiceResponse] = Field(..., description="لیست فاکتور ها")
+    items: List[SaleInvoiceResponse] = Field(..., description="لیست فاکتور ها")
 
 # ---------------------------purchaseitem---------------------------------------------------
 # ------------------------------------------------------------------------------------------
@@ -130,7 +134,7 @@ class PurchaseItemCreateResponse(BaseDTO):
     product_name: str = Field(..., description="نام کالا")
     barcode: Optional[str] = Field(None, description="بارکد کالا")
     quantity: float = Field(..., description="تعداد")
-    unit: str = Field(..., description="واحد")
+    selected_unit: UnitType = Field(..., description="واحد انتخاب شده برای خرید")
     unit_price: int = Field(..., description="قیمت واحد")
     total_price: int = Field(..., description="قیمت کل")
     created_at: datetime = Field(..., description="تاریخ ایجاد")
@@ -145,6 +149,8 @@ class PurchaseItemDeleteResponse(BaseDTO):
 class PurchaseItemDetailResponse(PurchaseItemCreateResponse):
     pass
 
+# ---------------------------purchaseinvoice------------------------------------------------
+# ------------------------------------------------------------------------------------------
 class PurchaseInvoiceSchema(BaseDTO):
     id: UUID = Field(..., description="شناسه فاکتور")
     invoice_number: str = Field(..., description="شماره فاکتور")
@@ -190,13 +196,15 @@ class InventorySchema(BaseDTO):
     product_name: str = Field(..., description="نام کالا")
     barcode: Optional[str] = Field(None, description="بارکد کالا")
     current_stock: int = Field(..., description="موجودی فعلی")
-    unit: str = Field(..., description="واحد کالا")
+    unit: UnitType = Field(..., description="واحد کالا")
+    sub_unit: UnitType = Field(..., description="واحد دوم کالا")
+    conversion_factor: int = Field(..., description="ضریب تبدیل واحد بزرگ به کوچک")
 
 class InventoryMovementResponse(BaseDTO):
     id: UUID = Field(..., description="شناسه حرکت")
     product_id: UUID = Field(..., description="شناسه کالا")
     product_name: str = Field(..., description="نام کالا")
-    type: str = Field(..., description="نوع حرکت (purchase/sale/correction)")
+    type: WarehouseType = Field(..., description="نوع حرکت")
     reference_id: UUID = Field(..., description="شناسه مرجع (فاکتور خرید/فروش)")
     quantity: int = Field(..., description="تعداد (مثبت=ورود، منفی=خروج)")
     stock_before: int = Field(..., description="موجودی قبل از حرکت")
@@ -209,7 +217,7 @@ class InventoryMovementListRequest(BaseDTO):
     from_date: Optional[datetime] = Field(None, description="از تاریخ")
     to_date: Optional[datetime] = Field(None, description="تا تاریخ")
     product_id: Optional[UUID] = Field(None, description="شناسه کالا")
-    type: Optional[str] = Field(None, description="نوع حرکت (purchase/sale/correction)")
+    type: Optional[WarehouseType] = Field(None, description="نوع حرکت (purchase/sale/correction)")
 
 class InventoryMovementListResponse(BaseDTO):
     total: int = Field(..., description="تعداد کل حرکات")
@@ -267,7 +275,7 @@ class TopProductsRequest(ProfitSchema):
     limit: int = Field(10, ge=1, le=100, description="تعداد نتایج")
 
 class TopProductItemResponse(BaseDTO):
-    product_id: str = Field(..., description="شناسه کالا")
+    product_id: UUID = Field(..., description="شناسه کالا")
     product_name: str = Field(..., description="نام کالا")
     total_quantity: int = Field(..., description="تعداد کل فروخته شده")
     total_amount: int = Field(..., description="مبلغ کل فروش")

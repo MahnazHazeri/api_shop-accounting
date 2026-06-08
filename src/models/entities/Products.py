@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime,timezone
 from archipy.models.entities.sqlalchemy.base_entities import UpdatableDeletableAdminEntity
-from sqlalchemy import UUID,Integer,String,Enum as TYPEEnum,text,DateTime
+from sqlalchemy import UUID,Integer,String,Enum as TYPEEnum,text,DateTime,Numeric
 from sqlalchemy.orm import Mapped, Synonym, mapped_column
 
 from src.models.type.enum_type import UnitType
@@ -20,8 +20,10 @@ class Products(UpdatableDeletableAdminEntity):
     purchase_price: Mapped[int] = mapped_column(Integer, nullable=False,)
     normal_price: Mapped[int] = mapped_column(Integer, nullable=False,)
     discounted_price: Mapped[int] = mapped_column(Integer, nullable=False,)
-    current_stock: Mapped[int] = mapped_column(Integer, nullable=True, server_default=text("0"),)
+    current_stock: Mapped[float] = mapped_column(Numeric(asdecimal=False), nullable=False, server_default=text("0"),)
     unit: Mapped[UnitType] = mapped_column(TYPEEnum, default=UnitType.NUMBER,)
-    default_sale_unit: Mapped[str] = mapped_column(TYPEEnum, default=UnitType.NUMBER,)
+    sub_unit: Mapped[UnitType] = mapped_column(TYPEEnum, default=UnitType.NUMBER)
+    conversion_factor : Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False,)
+
 

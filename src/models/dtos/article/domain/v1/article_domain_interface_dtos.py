@@ -1,37 +1,39 @@
 from uuid import UUID
-from datetime import date, datetime
-from typing import Optional,List
-from pydantic import Field,model_validator
+from datetime import date , datetime
+from typing import Optional ,List
+from pydantic import Field ,model_validator
 from archipy.models.dtos.base_dtos import BaseDTO
 
-from src.models.type.enum_type import UnitType,PymantType,RoleType
+from src.models.type.enum_type import UnitType ,PymantType, RoleType
 
 # --------------------------------------Prodacte-------------------------------------
 # -----------------------------------------------------------------------------------
 class BaseSchemaProducts(BaseDTO):
-    name: str = Field(..., description="نام کالا")
-    barcode: Optional[str] = Field(None, description="بارکد کالا")
-    purchase_price: Optional[int] = Field(None, description="قیمت خرید")
-    normal_price: int = Field(..., description="قیمت عادی")
-    discounted_price: int = Field(..., description="قیمت تخفیفی")
+    name: str = Field(...,description="نام کالا")
+    barcode: Optional[str] = Field(None , description="بارکد کالا")
+    purchase_price: int = Field(..., description="قیمت خرید")
+    normal_price: int = Field(... , description="قیمت فروش ")
+    discounted_price: int = Field(... , description="قیمت تخفیفی")
     current_stock: Optional[int] = Field(0, description="موجودی فعلی")
     unit: Optional[UnitType] = Field(UnitType.NUMBER, description="واحد")
-    default_sale_unit: Optional[UnitType] = Field(UnitType.NUMBER, description="واحد پیش فرض فروش")
+    sub_unit:Optional[UnitType] = Field(UnitType.PACK,description="واحد بزرگتر")
+    conversion_factor: Optional[int] = Field(None, ge=0,description="ضریب تبدیل")
 
 class ProductIdentifier(BaseDTO):
     id: Optional[UUID] = Field(None, description="شناسه یکتا")
     name: Optional[str] = Field(None, description="نام کالا")
     barcode: Optional[str] = Field(None, description="بارکد کالا")
 
-class ProductsCreate(BaseDTO):
-    name: str = Field(..., description="نام کالا (اجباری)")
-    barcode: Optional[str] = Field(None, description="بارکد کالا")
-    purchase_price: Optional[int] = Field(None, ge=0, description="قیمت خرید")
-    normal_price: int = Field(..., ge=0, description="قیمت فروش")
-    discounted_price: int = Field(..., ge=0, description="قیمت تخفیفی")
-    current_stock: Optional[int] = Field(0, ge=0, description="موجود فعلی")
-    unit: Optional[UnitType] = Field(UnitType.NUMBER, description="واحد کالا")
-    default_sale_unit: Optional[UnitType] = Field(UnitType.NUMBER, description="واحد پیش فرض فروش")
+class ProductsCreate(BaseSchemaProducts):
+    @model_validator(mode='after')
+    def defult_sub_unit(self):
+        if self.sub_unit is None:
+            self.sub_unit = self.unit
+
+        if self.conversion_factor is None:
+            self.conversion_factor = 1
+
+        return self
 
 class EditproductRequest(ProductIdentifier):
     name: Optional[str] = Field(None, description="نام کالا")
@@ -65,7 +67,7 @@ class SearchSupplierRequest(BaseDTO):
 class SaleItemCreateRequest(BaseDTO):
     name: Optional[str] = Field(None, description="نام کالا (برای کالاهای بدون بارکد)")
     barcode: Optional[str] = Field(None, description="بارکد کالا")
-    quantity: float = Field(..., gt=0, description="تعداد (عدد/کیلو/لیتر)")
+    quantity: float = Field(..., gt=0, description="تعداد (عدد/کیلو)")
 
 class SaleItemUpdateRequest(BaseDTO):
     quantity: Optional[float] = Field(None, gt=0, description="تعداد جدید")
@@ -88,7 +90,7 @@ class SaleInvoiceUpdateRequest(BaseDTO):
 class PurchaseItemCreateRequest(BaseDTO):
     name: Optional[str] = Field(None, description="نام کالا")
     barcode: Optional[str] = Field(None, description="بارکد کالا")
-    quantity: float = Field(..., gt=0, description="تعداد (عدد/کیلو/)")
+    quantity: float = Field(..., gt=0, description="تعداد (عدد/کیلو)")
     unit_price: int = Field(..., gt=0, description="قیمت واحد")
 
     @model_validator(mode="after")
@@ -98,7 +100,7 @@ class PurchaseItemCreateRequest(BaseDTO):
         return self
 
 class PurchaseItemUpdateRequest(BaseDTO):
-    quantity: Optional[float] = Field(None, gt=0, description="تعداد (عدد/کیلو/)")
+    quantity: Optional[float] = Field(None, gt=0, description="تعداد (عدد/کیلو)")
     unit_price: Optional[int] = Field(None, gt=0, description="قیمت واحد")
 # --------------------------------------------purchaseinvoce------------------------------------------
 # ----------------------------------------------------------------------------------------------------
