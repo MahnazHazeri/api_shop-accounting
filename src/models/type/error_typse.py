@@ -1,3 +1,5 @@
+# Definition of custom error types for the application
+
 from http import HTTPStatus
 
 from archipy.models.errors import (
